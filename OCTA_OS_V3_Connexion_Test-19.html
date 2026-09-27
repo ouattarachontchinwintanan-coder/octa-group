@@ -25,8 +25,31 @@ $('diagnostic').onclick = async () => {
       throw Error('Crée d’abord un dossier fictif.');
     }
 
-    const { error } =
-      await client.from('octa_diagnostics').insert({
+    
+const { data: diagnostic, error } =
+  await client
+    .from('octa_diagnostics')
+    .insert({
+      client_id: clients[0].id,
+      owner_id: auth.user.id,
+      answers: {
+        test: true,
+        activite: 'commerce'
+      },
+      orientation: ['OCTA Trade'],
+      recommendations: 'Diagnostic fictif de test.'
+    })
+    .select('id, client_id')
+    .single();
+
+if (error) throw error;
+
+if (!diagnostic) {
+  throw Error('Aucun diagnostic retourné.');
+}
+
+say('Diagnostic enregistré. ID : ' + diagnostic.id);
+
         client_id: clients[0].id,
         owner_id: auth.user.id,
         answers: {
