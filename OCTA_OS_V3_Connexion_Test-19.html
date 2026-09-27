@@ -50,19 +50,7 @@ if (!diagnostic) {
 
 say('Diagnostic enregistré. ID : ' + diagnostic.id);
 
-        client_id: clients[0].id,
-        owner_id: auth.user.id,
-        answers: {
-          test: true,
-          activite: 'commerce'
-        },
-        orientation: ['OCTA Trade'],
-        recommendations: 'Diagnostic fictif de test.'
-      });
-
-    if (error) throw error;
-
-    say('Diagnostic fictif créé avec succès !');
+        
   } catch (e) {
     say('Erreur diagnostic : ' + e.message);
   }
