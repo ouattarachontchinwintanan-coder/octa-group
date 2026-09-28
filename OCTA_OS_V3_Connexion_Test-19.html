@@ -281,5 +281,69 @@ say('Association enregistrée : ' +
     say('Erreur association : ' + e.message);
   }
 };
-           $('signOut').onclick=async()=>{if(client)await client.auth.signOut();show('workspace',false);$('records').replaceChildren();say('Déconnecté.');};})();
+           
+$('showMissionPartners').onclick = async () => {
+  try {
+    const { data: auth, error: authError } =
+      await client.auth.getUser();
+
+    if (authError || !auth.user) {
+      throw Error('Reconnecte-toi.');
+    }
+
+    const missionId =
+      'cc39e808-361e-4b6f-b4dd-dc2957fd6868';
+
+    const { data: links, error: linksError } =
+      await client.from('octa_mission_partners')
+        .select('partner_id, role_description')
+        .eq('mission_id', missionId)
+        .eq('owner_id', auth.user.id);
+
+    if (linksError) throw linksError;
+
+    const ul = $('records');
+    ul.replaceChildren();
+
+    if (!links.length) {
+      say('Aucun partenaire associé à cette mission.');
+      return;
+    }
+
+    const partnerIds = links.map(link => link.partner_id);
+
+    const { data: partners, error: partnersError } =
+      await client.from('octa_partners')
+        .select('id, name, specialty')
+        .eq('owner_id', auth.user.id)
+        .in('id', partnerIds);
+
+    if (partnersError) throw partnersError;
+
+    for (const link of links) {
+      const partner = partners.find(
+        p => p.id === link.partner_id
+      );
+
+      if (!partner) continue;
+
+      const li = document.createElement('li');
+      li.textContent =
+        partner.name +
+        ' — Spécialité : ' + partner.specialty +
+        ' — Rôle : ' +
+        (link.role_description || 'Non précisé');
+
+      ul.append(li);
+    }
+
+    say(ul.children.length +
+      ' partenaire(s) affiché(s).');
+
+  } catch (e) {
+    say('Erreur de lecture des partenaires : ' +
+      e.message);
+  }
+};
+      $('signOut').onclick=async()=>{if(client)await client.auth.signOut();show('workspace',false);$('records').replaceChildren();say('Déconnecté.');};})();
 </script></body></html>
