@@ -267,8 +267,11 @@ $('linkPartner').onclick = async () => {
 
     if (error) throw error;
 
-    say('Association enregistrée. ID : ' +
-      association.id);
+    
+say('Association enregistrée : ' +
+  association.mission_id + ' / ' +
+  association.partner_id);
+    
   } catch (e) {
     say('Erreur association : ' + e.message);
   }
