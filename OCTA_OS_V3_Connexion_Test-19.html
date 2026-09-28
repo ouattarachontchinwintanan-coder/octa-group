@@ -57,5 +57,30 @@ say('Diagnostic enregistré. ID : ' + diagnostic.id);
     say('Erreur diagnostic : ' + e.message);
   }
 };
+  
+$('showDiagnostics').onclick = async () => {
+  try {
+    const { data, error } = await client
+      .from('octa_diagnostics')
+      .select('id, orientation, created_at')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    const ul = $('records');
+    ul.replaceChildren();
+
+    for (const d of data) {
+      const li = document.createElement('li');
+      li.textContent =
+        d.id + ' — ' + d.orientation.join(', ');
+      ul.append(li);
+    }
+
+    say(data.length + ' diagnostic(s) visible(s).');
+  } catch (e) {
+    say('Erreur de lecture : ' + e.message);
+  }
+};
   $('signOut').onclick=async()=>{if(client)await client.auth.signOut();show('workspace',false);$('records').replaceChildren();say('Déconnecté.');};})();
 </script></body></html>
