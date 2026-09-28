@@ -180,6 +180,21 @@ $('showMissions').onclick = async () => {
         .order('created_at', { ascending: false });
 
     if (error) throw error;
+const missionSelect = $('missionSelect');
+missionSelect.replaceChildren();
+
+const placeholder = document.createElement('option');
+placeholder.value = '';
+placeholder.textContent = 'Sélectionne une mission';
+missionSelect.append(placeholder);
+
+for (const mission of missions) {
+  const option = document.createElement('option');
+  option.value = mission.id;
+  option.textContent = mission.title + ' — ' + mission.pole;
+  missionSelect.append(option);
+  }
+  
 
     const ul = $('records');
     ul.replaceChildren();
