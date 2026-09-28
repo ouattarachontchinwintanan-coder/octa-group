@@ -85,5 +85,50 @@ $('showDiagnostics').onclick = async () => {
     say('Erreur de lecture : ' + e.message);
   }
 };
+  
+$('createMission').onclick = async () => {
+  try {
+    const { data: auth, error: authError } =
+      await client.auth.getUser();
+
+    if (authError || !auth.user) {
+      throw Error('Reconnecte-toi.');
+    }
+
+    const { data: clients, error: clientError } =
+      await client
+        .from('octa_clients')
+        .select('id')
+        .eq('owner_id', auth.user.id)
+        .order('created_at', { ascending: true })
+        .limit(1);
+
+    if (clientError) throw clientError;
+
+    if (!clients.length) {
+      throw Error('Aucun client fictif trouvé.');
+    }
+
+    const { data: mission, error } =
+      await client
+        .from('octa_missions')
+        .insert({
+          client_id: clients[0].id,
+          owner_id: auth.user.id,
+          pole: 'OCTA Trade',
+          title: 'Accompagnement commercial',
+          status: 'a_planifier',
+          quote_status: 'brouillon'
+        })
+        .select('id')
+        .single();
+
+    if (error) throw error;
+
+    say('Mission enregistrée. ID : ' + mission.id);
+  } catch (e) {
+    say('Erreur mission : ' + e.message);
+  }
+};
   $('signOut').onclick=async()=>{if(client)await client.auth.signOut();show('workspace',false);$('records').replaceChildren();say('Déconnecté.');};})();
 </script></body></html>
