@@ -203,5 +203,76 @@ $('createPartner').onclick = async () => {
     say('Erreur partenaire : ' + e.message);
   }
 };
-      $('signOut').onclick=async()=>{if(client)await client.auth.signOut();show('workspace',false);$('records').replaceChildren();say('Déconnecté.');};})();
+      
+$('linkPartner').onclick = async () => {
+  try {
+    const { data: auth, error: authError } =
+      await client.auth.getUser();
+
+    if (authError || !auth.user) {
+      throw Error('Reconnecte-toi.');
+    }
+
+    const missionId =
+      'cc39e808-361e-4b6f-b4dd-dc2957fd6868';
+
+    const partnerId =
+      '84074b11-7ba9-4809-9e85-b6c1ca1d638e';
+
+    const { data: mission, error: missionError } =
+      await client.from('octa_missions')
+        .select('id')
+        .eq('id', missionId)
+        .eq('owner_id', auth.user.id)
+        .single();
+
+    if (missionError || !mission) {
+      throw Error('Mission introuvable pour ce compte.');
+    }
+
+    const { data: partner, error: partnerError } =
+      await client.from('octa_partners')
+        .select('id')
+        .eq('id', partnerId)
+        .eq('owner_id', auth.user.id)
+        .single();
+
+    if (partnerError || !partner) {
+      throw Error('Partenaire introuvable pour ce compte.');
+    }
+
+    const { data: existing, error: checkError } =
+      await client.from('octa_mission_partners')
+        .select('id')
+        .eq('mission_id', missionId)
+        .eq('partner_id', partnerId)
+        .limit(1);
+
+    if (checkError) throw checkError;
+
+    if (existing.length) {
+      say('Ce partenaire est déjà associé à la mission.');
+      return;
+    }
+
+    const { data: association, error } =
+      await client.from('octa_mission_partners')
+        .insert({
+          mission_id: missionId,
+          partner_id: partnerId,
+          owner_id: auth.user.id,
+          role_description: 'Conseil commercial'
+        })
+        .select('id')
+        .single();
+
+    if (error) throw error;
+
+    say('Association enregistrée. ID : ' +
+      association.id);
+  } catch (e) {
+    say('Erreur association : ' + e.message);
+  }
+};
+           $('signOut').onclick=async()=>{if(client)await client.auth.signOut();show('workspace',false);$('records').replaceChildren();say('Déconnecté.');};})();
 </script></body></html>
