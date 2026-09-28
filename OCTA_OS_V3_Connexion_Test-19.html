@@ -243,12 +243,11 @@ $('linkPartner').onclick = async () => {
 
     const { data: existing, error: checkError } =
       await client.from('octa_mission_partners')
-        .select('id')
-        .eq('mission_id', missionId)
-        .eq('partner_id', partnerId)
-        .limit(1);
-
-    if (checkError) throw checkError;
+.select('mission_id, partner_id')
+.eq('mission_id', missionId)
+.eq('partner_id', partnerId)
+.limit(1);
+   f (checkError) throw checkError;
 
     if (existing.length) {
       say('Ce partenaire est déjà associé à la mission.');
