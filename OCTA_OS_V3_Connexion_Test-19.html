@@ -129,9 +129,9 @@ $('createMission').onclick = async () => {
           status: 'a_planifier',
           quote_status: 'brouillon'
         })
-        .select('id')
-        .single();
-
+        
+.select('mission_id, partner_id')
+.single();
     if (error) throw error;
 
     say('Mission enregistrée. ID : ' + mission.id);
