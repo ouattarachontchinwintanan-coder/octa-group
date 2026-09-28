@@ -247,7 +247,7 @@ $('linkPartner').onclick = async () => {
 .eq('mission_id', missionId)
 .eq('partner_id', partnerId)
 .limit(1);
-   f (checkError) throw checkError;
+   if (checkError) throw checkError;
 
     if (existing.length) {
       say('Ce partenaire est déjà associé à la mission.');
@@ -262,8 +262,10 @@ $('linkPartner').onclick = async () => {
           owner_id: auth.user.id,
           role_description: 'Conseil commercial'
         })
-        .select('id')
-        .single();
+       
+   .select('mission_id, partner_id')
+   .single();
+    
 
     if (error) throw error;
 
